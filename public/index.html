@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LAN File Sharer</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <header class="header">
+    <h1 class="logo">LAN File Sharer</h1>
+    <div class="server-address">
+      <span class="label">Sunucu Adresi:</span>
+      <code class="url" id="serverUrl">Yükleniyor…</code>
+      <button type="button" class="btn-copy" id="copyUrl" title="Adresi kopyala">Kopyala</button>
+      <button type="button" class="btn-qr" id="btnQr" title="Mobilden Bağlan">📱 QR Kod</button>
+      <button type="button" class="btn-settings" id="btnSettings" title="Ayarlar">⚙ Ayarlar</button>
+    </div>
+  </header>
+
+  <div class="modal-overlay" id="qrModal" hidden>
+    <div class="modal qr-modal" role="dialog" aria-labelledby="qrTitle">
+      <h2 class="modal-title" id="qrTitle">Mobilden Bağlan</h2>
+      <div class="modal-body qr-body">
+        <div id="qrcode"></div>
+        <p class="qr-text">Bu QR kodu telefonunuzun kamerasıyla okutarak ağa bağlanın.</p>
+        <code class="qr-url" id="qrUrlText"></code>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-modal btn-cancel" id="qrClose">Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="settingsModal" hidden>
+    <div class="modal" role="dialog" aria-labelledby="settingsTitle">
+      <h2 class="modal-title" id="settingsTitle">Ayarlar</h2>
+      <div class="modal-body">
+        <label class="modal-label" for="cleanupSelect">Eski dosyaları otomatik sil</label>
+        <select id="cleanupSelect" class="modal-select">
+          <option value="0">Kapalı</option>
+          <option value="5">5 dakika sonra</option>
+          <option value="15">15 dakika sonra</option>
+          <option value="30">30 dakika sonra</option>
+          <option value="60">1 saat sonra</option>
+          <option value="180">3 saat sonra</option>
+          <option value="360">6 saat sonra</option>
+          <option value="720">12 saat sonra</option>
+          <option value="1440">24 saat sonra</option>
+          <option value="2880">48 saat sonra</option>
+          <option value="10080">1 hafta sonra</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-modal btn-cancel" id="settingsCancel">İptal</button>
+        <button type="button" class="btn-modal btn-save" id="settingsSave">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="main">
+    <section class="upload-section">
+      <h2 class="section-title">Dosya Yükle</h2>
+      <div class="dropzone" id="dropzone">
+        <input type="file" id="fileInput" multiple hidden>
+        <p class="dropzone-text">Dosyaları buraya sürükleyin veya tıklayın</p>
+        <div class="progress-wrap" id="progressWrap" hidden>
+          <div class="progress-bar" id="progressBar"></div>
+          <span class="progress-text" id="progressText">0%</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="dashboard-section">
+      <h2 class="section-title">Hangi bilgisayardan ne yüklendi?</h2>
+      <div class="devices-grid">
+        <article class="device-panel device-this">
+          <div class="device-header">
+            <span class="device-icon">💻</span>
+            <h3 class="device-title">Bu bilgisayar</h3>
+            <span class="device-ip" id="myIpLabel">—</span>
+            <span class="device-count" id="countThis">0 dosya</span>
+          </div>
+          <ul class="file-list" id="fileListThis">
+            <li class="file-list-empty">Yükleniyor…</li>
+          </ul>
+        </article>
+        <article class="device-panel device-other">
+          <div class="device-header">
+            <span class="device-icon">🖥️</span>
+            <h3 class="device-title">Diğer bilgisayar(lar)</h3>
+            <span class="device-count" id="countOther">0 dosya</span>
+          </div>
+          <ul class="file-list" id="fileListOther">
+            <li class="file-list-empty">Yükleniyor…</li>
+          </ul>
+        </article>
+      </div>
+      <div class="download-progress-wrap" id="downloadProgressWrap" hidden>
+        <div class="download-progress-bar" id="downloadProgressBar"></div>
+        <span class="download-progress-text" id="downloadProgressText">0%</span>
+      </div>
+      <div class="toolbar">
+        <button type="button" class="btn-select-all" id="btnSelectAll">Tümünü seç</button>
+        <button type="button" class="btn-download-zip" id="btnDownloadZip">Seçili dosyaları indir (ZIP)</button>
+        <button type="button" class="btn-refresh" id="refreshList">Listeyi yenile</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
