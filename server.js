@@ -23,9 +23,11 @@ const internalIp = require('internal-ip');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const UPLOADS_DIR = process.env.LANFILE_UPLOADS || process.env.UPLOADS_DIR
-  ? path.resolve(process.env.LANFILE_UPLOADS || process.env.UPLOADS_DIR)
-  : path.join(__dirname, 'uploads');
+const UPLOADS_DIR = process.env.LANFILE_UPLOADS
+  ? path.resolve(process.env.LANFILE_UPLOADS)
+  : (process.env.LANFILE_USER_DATA
+      ? path.join(process.env.LANFILE_USER_DATA, 'uploads')
+      : path.join(__dirname, 'uploads'));
 const METADATA_PATH = path.join(UPLOADS_DIR, 'metadata.json');
 const CONFIG_PATH = path.join(UPLOADS_DIR, 'config.json');
 
@@ -331,31 +333,38 @@ async function start() {
   runCleanup();
   setInterval(runCleanup, 60 * 1000); // Check cleanup every minute
 
-  const cfg = readConfig();
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log('\n  LAN File Sharer çalışıyor.\n');
-    console.log('  Yükleme klasörü: ' + UPLOADS_DIR);
-    if (cfg.cleanupAfterMinutes > 0) {
-      const hours = Math.floor(cfg.cleanupAfterMinutes / 60);
-      const mins = cfg.cleanupAfterMinutes % 60;
-      const timeStr = hours > 0 ? `${hours} saat ${mins} dakika` : `${mins} dakika`;
-      console.log('  Eski dosya silme: ' + timeStr + ' sonra (ayarlardan değiştirilebilir)\n');
-    } else {
-      console.log('  Eski dosya silme: kapalı\n');
-    }
-    console.log('  Bu bilgisayarın yerel IP adresi: ' + displayUrl + '\n');
-    if (process.stdout.isTTY) {
-      try {
-        const { execSync } = require('child_process');
-        if (process.platform === 'win32') {
-          execSync(`echo ${displayUrl} | clip`, { stdio: 'ignore' });
-        }
-      } catch (_) {}
-    }
+  return new Promise((resolve) => {
+    const cfg = readConfig();
+    const server = app.listen(PORT, '0.0.0.0', () => {
+      console.log('\n  LAN File Sharer çalışıyor.\n');
+      console.log('  Yükleme klasörü: ' + UPLOADS_DIR);
+      if (cfg.cleanupAfterMinutes > 0) {
+        const hours = Math.floor(cfg.cleanupAfterMinutes / 60);
+        const mins = cfg.cleanupAfterMinutes % 60;
+        const timeStr = hours > 0 ? `${hours} saat ${mins} dakika` : `${mins} dakika`;
+        console.log('  Eski dosya silme: ' + timeStr + ' sonra (ayarlardan değiştirilebilir)\n');
+      } else {
+        console.log('  Eski dosya silme: kapalı\n');
+      }
+      console.log('  Bu bilgisayarın yerel IP adresi: ' + displayUrl + '\n');
+      if (process.stdout.isTTY) {
+        try {
+          const { execSync } = require('child_process');
+          if (process.platform === 'win32') {
+            execSync(`echo ${displayUrl} | clip`, { stdio: 'ignore' });
+          }
+        } catch (_) {}
+      }
+      resolve(PORT);
+    });
   });
 }
 
-start().catch((err) => {
-  console.error('Sunucu başlatılamadı:', err);
-  process.exit(1);
-});
+if (require.main === module) {
+  start().catch((err) => {
+    console.error('Sunucu başlatılamadı:', err);
+    process.exit(1);
+  });
+}
+
+module.exports = start;

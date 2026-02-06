@@ -5,6 +5,7 @@ package-lock.json
 # Upload directory and user data
 uploads/
 *.log
+.cache/
 
 # Environment variables
 .env

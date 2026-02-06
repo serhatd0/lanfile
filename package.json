@@ -2,10 +2,35 @@
   "name": "lan-file-sharer",
   "version": "1.0.0",
   "description": "High-performance file sharing application for local area networks with automatic cleanup and real-time progress tracking",
-  "main": "server.js",
+  "main": "main.js",
   "scripts": {
     "start": "node server.js",
+    "electron": "electron .",
+    "dist": "electron-builder",
+    "pack": "electron-packager . --overwrite --out=dist --icon=public/favicon.ico",
     "dev": "node server.js"
+  },
+  "build": {
+    "appId": "com.lanfilesharer.app",
+    "productName": "LAN File Sharer",
+    "win": {
+      "target": "nsis",
+      "icon": "public/favicon.ico",
+      "verifyUpdateCodeSignature": false,
+      "forceCodeSigning": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "files": [
+      "**/*",
+      "!dist/*",
+      "!uploads/*"
+    ],
+    "directories": {
+      "output": "dist"
+    }
   },
   "keywords": [
     "lan",
@@ -18,18 +43,19 @@
     "upload",
     "download",
     "real-time",
-    "progress-tracking"
+    "progress-tracking",
+    "electron"
   ],
   "author": "",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/lan-file-sharer.git"
+    "url": "https://github.com/serhatd0/lanfile.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/lan-file-sharer/issues"
+    "url": "https://github.com/serhatd0/lanfile/issues"
   },
-  "homepage": "https://github.com/yourusername/lan-file-sharer#readme",
+  "homepage": "https://github.com/serhatd0/lanfile#readme",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
@@ -40,5 +66,10 @@
     "express": "^4.18.2",
     "internal-ip": "^6.2.0",
     "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.6.4",
+    "electron-packager": "^17.1.2"
   }
 }
